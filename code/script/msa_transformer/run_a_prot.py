@@ -11,6 +11,15 @@ import string
 from collections import defaultdict 
 import pandas as pd 
 from . import aln_to_a3m
+import warnings
+
+# InstanceNorm warning
+warnings.filterwarnings(
+    "ignore",
+    message="input's size at dim=1 does not match num_features",
+    category=UserWarning,
+    module="torch.nn.modules.instancenorm"
+)
 
 # --- Constants ---
 MAX_MSA_ROW_NUM = 800

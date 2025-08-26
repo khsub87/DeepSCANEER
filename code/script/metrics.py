@@ -8,7 +8,6 @@ def dcg_at_k(relevance, k):
     return np.sum(gains / discounts)
 
 def ndcg_at_k_minmax(predictions, relevance, k):
-    """Min-Max 스케일링 기반 NDCG"""
     scaler = MinMaxScaler()
     relevance = np.asarray(relevance).reshape(-1, 1)
     norm_relevance = scaler.fit_transform(relevance).flatten()

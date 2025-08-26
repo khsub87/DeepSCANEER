@@ -56,22 +56,16 @@ class ProcMsa:
         msa_dic = {}
         for seq in self.result:
             if seq.id == query_id[:30]:
-                #msa_dic[query_id] = seq.seq.tostring()
                 msa_dic[query_id] = str(seq.seq)
             else:
-	            #msa_dic[seq.id] = seq.seq.tostring()
 	            msa_dic[seq.id] = str(seq.seq)
         query_seq = msa_dic[query_id]
-        #print(msa_dic)
-        # MSA position
         res_pos_dic = {}
         msa_pos, query_res_pos = (0, 0)
         column_len = float(len(self.result))
         val_res = []
         for msa_num in range(len(query_seq)):
             column = list(map(lambda x: x[msa_num], msa_dic.values()))
-            #print(column)
-            #column = self.result.get_column(msa_num)
             if query_seq[msa_num] != '-':
                 if column.count('-') / column_len < cutoff:
                     res_pos_dic[msa_pos] = query_res_pos
@@ -84,16 +78,7 @@ class ProcMsa:
             for res_num in val_res:
                 seq += msa_dic[seq_id][res_num]
             print (seq_id + ' ' + seq, file=out_f)
-        # print(self.result)
-        # print('column_len is %s'%column_len)
-        # print(query_seq)
-        # print('len is %s'%len(query_seq.replace('-', '')))
-
-        # print('msa_pos is %s'%msa_pos)
-        # print('query_pos is %s'%query_res_pos)
-        # print('len is %s'%len(query_seq.replace('-', '')))
         out_f.close()    
-        #return res_pos_dic, int(column_len)
         return res_pos_dic, len(query_seq.replace('-', ''))
     
     def makeCSinput(self, output_file, cut_num=None):

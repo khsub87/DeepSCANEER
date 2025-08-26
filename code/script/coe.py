@@ -2,7 +2,6 @@ import os, sys
 from script import lib_path
 import subprocess
 
-dhpylib_path="./script"
 def check_conf_file():
 	f = open("./script/coe/Energetics.properties")
 	line_list = f.readlines()
@@ -32,28 +31,12 @@ class ProcCoe:
             jexePath = 'java.exe'
             cmd_apd = ' & '
         else: # Linux Environment
-            #jexePath = os.path.join(dhpylib_path, "jre/linux/bin/java")
             jexePath = "java"
-            #java_path = os.path.expanduser("~/.conda/envs/PE/bin/java")
             cmd_apd = ';'
-        jClassPath = os.path.join(dhpylib_path, "coe")
+        jClassPath = os.path.join("./script", "coe")
         jClassAlgorithm = "covariance.algorithms.%s" % self.algorithm
         exejClass =[jexePath, jClassAlgorithm, self.input_aln_file, self.output_coe_file]
-        #try:
-            #with open(os.path.join(jClassPath, "coeerror.txt"), "w") as err_file:
         result=subprocess.run(exejClass, cwd=jClassPath, capture_output=True, text=True, check=True)
-        #print("stdout:",result.stdout)
-        #print("stderr:",result.stderr)
-        #except subprocess.CalledProcessError as e:
-        #    print("Error: Java 실행 실패!")
-        #    print("Exit Code:", e.returncode)  # 비정상 종료 코드
-        #    print("stdout:", e.stdout)
-        #    print("stderr:", e.stderr)  # 상세 오류 메시지 출력
-        
-
-        #exejClass = "%s %s %s %s 2" % (jexePath, jClassAlgorithm, self.input_aln_file, self.output_coe_file) 
-
-        #os.system(cmd_apd.join(['cd %s' % jClassPath, exejClass]))
 		
     # Parse coe-calculation result
     def parse(self):

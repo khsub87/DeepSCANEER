@@ -45,7 +45,6 @@ class Classifier(nn.Module):
         x = self.conv2(x)
         x = self.relu2(x)
         
-        # Flatten for FC layers
         x = x.view(x.size(0), -1)
         
         x = self.fc1(x)

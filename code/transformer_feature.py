@@ -1,17 +1,14 @@
 import os
 import numpy as np
 import pandas as pd
-import torch
-import torch.nn as nn
 
-AA_list = ['A','R','N','D','C','Q','E','G','H','I','L','K','M','F','P','S','T','W','Y','V']
+AA_LIST = list("ARNDCQEGHILKMFPSTWYV")
 
 def calc_transformer_feature(protein, data_dir, ent_dic, attention, attention_trans):
     """
     Calculate combined transformer features and SCI-weighted input features for a protein.
     """
     
-    AA_list = ['A','R','N','D','C','Q','E','G','H','I','L','K','M','F','P','S','T','W','Y','V']
     # Load sequence from fasta
     fasta_path = os.path.join(f'../data/{protein}', f'{protein}.fasta')
     with open(fasta_path) as f:
@@ -39,15 +36,16 @@ def calc_transformer_feature(protein, data_dir, ent_dic, attention, attention_tr
     # Build result DataFrame
     result = pd.DataFrame()
     index = 0
-    length = calc_matrix.shape[1] // len(AA_list)
+    length = calc_matrix.shape[1] // len(AA_LIST)
 
+    data_dict={}
     for res in range(1, length + 1):
-        for AA in AA_list:
+        for AA in AA_LIST:
             var = sequence[res - 1] + str(res) + AA
             sci_value = 0 if var[0] == var[-1] else sci_result['cn'][sci_result['mut'] == var].values
-            result[var] = np.append(calc_matrix[:, index], sci_value)
+            data_dict[var] = np.append(calc_matrix[:, index], sci_value)
             index += 1
-
+    result = pd.DataFrame(data_dict)
 
     # Save
     result.to_csv(os.path.join(data_dir, 'input_feature.tsv'), sep='\t', index=False)
