@@ -143,11 +143,12 @@ def extract_msa_transformer_features(msa_seq, msa_transformer, msa_batch_convert
 
 # --- Main function ---
 def calc_attention(data_dir, enzyme):
-    parser = argparse.ArgumentParser(description='A Prot: input msa and output .npz for trrosetta structure modeling')
-    parser.add_argument('--device', type=str, default='cpu', choices=['cpu', 'gpu'], help='choose device: cpu or gpu')
-    args = parser.parse_args()
+    #parser = argparse.ArgumentParser(description='A Prot: input msa and output .npz for trrosetta structure modeling')
+    #parser.add_argument('--device', type=str, default='cpu', choices=['cpu', 'gpu'], help='choose device: cpu or gpu')
+    #args = parser.parse_args()
 
-    device = torch.device("cpu") if args.device == 'cpu' or not torch.cuda.is_available() else torch.device("cuda:0")
+    #device = torch.device("cpu") if args.device == 'cpu' or not torch.cuda.is_available() else torch.device("cuda:0")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     msa_transformer, msa_alphabet = esm.pretrained.esm_msa1_t12_100M_UR50S()
     msa_batch_converter = msa_alphabet.get_batch_converter()
