@@ -22,7 +22,6 @@ def calc_ent_dic(output_dir, subst_list, prefix, msa_path):
         data[str(residue)] = [ent_dict.get(f"{residue}{AA}", 0) for AA in AA_LIST]
 
     ent_df = pd.DataFrame(data)
-    ent_df.to_csv(os.path.join(output_dir, "ent_dic.txt"), sep='\t', index=False)
     return ent_df
 
 def build_msa(msa_path):

@@ -44,7 +44,6 @@ def predict_with_fine_tuning(test_enzyme,pre_train_path,
     result = pd.DataFrame()
     test_input = torch.tensor(x_test, dtype=torch.float32).to(device)
 
-    ft_loss = defaultdict(list)
     train_input = torch.tensor(x_train, dtype=torch.float32).to(device)
     train_target = torch.tensor(y_train, dtype=torch.float32).to(device)
 
@@ -72,7 +71,6 @@ def predict_with_fine_tuning(test_enzyme,pre_train_path,
         torch.set_grad_enabled(True)
         # Fine-tuning
         for epoch in range(ft_epochs):
-            total_loss = 0
             for inputs, labels in train_loader:
                 model.train()
                 optimizer.zero_grad()
@@ -80,13 +78,6 @@ def predict_with_fine_tuning(test_enzyme,pre_train_path,
                 loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
-                total_loss += loss.item()
-
-            # save loss
-            ft_loss["enzyme"].append(test_enzyme)
-            ft_loss["fold"].append(fold)
-            ft_loss["epoch"].append(epoch)
-            ft_loss["loss"].append(total_loss / len(train_loader))
 
         # Evaluation
         model.eval()
@@ -94,9 +85,5 @@ def predict_with_fine_tuning(test_enzyme,pre_train_path,
             preds = model(test_input).cpu().numpy()
         result[fold] = preds
 
-    # save ft_loss 
-    out_dir = os.path.join(result_dir, "ft_loss", str(len(x_train)))
-    os.makedirs(out_dir, exist_ok=True)
-    pd.DataFrame(ft_loss).to_csv(f"{out_dir}/{test_enzyme}.txt", sep="\t", index=False)
 
     return result

@@ -50,15 +50,18 @@ def main(test_enzyme):
         result = predict_with_pretrained_model(pre_train_path,x_test)
     
     # Ensemble across folds
-    result['ensemble'] = result[list(range(0, 10))].mean(axis=1)
+    result['prediction_score'] = result[list(range(0, 10))].mean(axis=1)
     
     # Save per enzyme
-    column_names = ["mut"] + [f"fold{i}" for i in range(10)] + ["ensemble"]
-    data = [all_mutation] + [result[i] for i in range(10)] + [result['ensemble']]
+    column_names = ["variant"] + [f"version{i}" for i in range(10)] + ["prediction_score"]
+    data = [all_mutation] + [result[i] for i in range(10)] + [result['prediction_score']]
     test_enzyme_df = pd.DataFrame(data).T
     test_enzyme_df.columns = column_names
-    test_enzyme_df.to_csv(f"{result_dir}/{test_enzyme}_DeepSCANEER_prediction_2.tsv", sep="\t", index=False)
-    
+    if enzyme_specific_prediction=="True":
+        test_enzyme_df.to_csv(f"{result_dir}/{enzyme_ID}_DeepSCANEER_prediction_{enzyme_specific_data_num}.tsv", sep="\t", index=False)
+    elif enzyme_specific_prediction=="False":
+        test_enzyme_df.to_csv(f"{result_dir}/{enzyme_ID}_DeepSCANEER_prediction.tsv", sep="\t", index=False)
+
     return
 
 #########################################################################################
@@ -78,6 +81,7 @@ pre_train_path = f'../pre_train_weight'
 
 fine_tuning = False
 query_mutagenesis_path = f'{data_dir}/{test_enzyme}_score.txt' if fine_tuning else None
+enzyme_specific_data_num=100
 
 #########################################################################################
 
