@@ -143,11 +143,6 @@ def extract_msa_transformer_features(msa_seq, msa_transformer, msa_batch_convert
 
 # --- Main function ---
 def calc_attention(data_dir, enzyme):
-    #parser = argparse.ArgumentParser(description='A Prot: input msa and output .npz for trrosetta structure modeling')
-    #parser.add_argument('--device', type=str, default='cpu', choices=['cpu', 'gpu'], help='choose device: cpu or gpu')
-    #args = parser.parse_args()
-
-    #device = torch.device("cpu") if args.device == 'cpu' or not torch.cuda.is_available() else torch.device("cuda:0")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     msa_transformer, msa_alphabet = esm.pretrained.esm_msa1_t12_100M_UR50S()
@@ -167,13 +162,14 @@ def calc_attention(data_dir, enzyme):
         aln_to_a3m.make_a3m_modify_file(data_dir,enzyme)
 
     msa_seq, _= read_msa_file(a3m_dir)
-    msa_query_representation, msa_row_attentions = extract_msa_transformer_features(msa_seq, msa_transformer, msa_batch_converter, device=device)
+    with torch.no_grad():
+        msa_query_representation, msa_row_attentions = extract_msa_transformer_features(msa_seq, msa_transformer, msa_batch_converter, device=device)
 
-    msa_query_representation.to(device)
-    msa_row_attentions.to(device)
+        msa_query_representation.to(device)
+        msa_row_attentions.to(device)
 
-    x,_ = conv_model(msa_query_representation, msa_row_attentions)
-    x_trans = x.permute((0, 1,3, 2))
+        x,_ = conv_model(msa_query_representation, msa_row_attentions)
+        x_trans = x.permute((0, 1,3, 2))
 
     np.save(f"{data_dir}/{enzyme}_transformer_feature.npy", x.cpu().numpy())
     np.save(f"{data_dir}/{enzyme}_transformer_feature_trans.npy", x_trans.cpu().numpy())
