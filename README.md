@@ -20,13 +20,13 @@ Before running DeepSCANEER, make sure that all required input files are placed u
 
 + **FASTA file (*.fasta)** - Query sequence(s) in FASTA format.
 + **Alignment file (*.aln)** - Multiple sequence alignment for the query sequence(s).
-+ **Fine-tuning file (*_ft.txt)** (optional) - Required only for enzyme-specific predictions.
++ **low-throughput file (*_score.txt)** (optional) - Required only for enzyme-specific predictions.
 
 ## Running DeepSCANEER
 DeepSCANEER can be executed in one of two modes, depending on your analysis needs:
 
-1. Zero-shot prediction - (general-purpose prediction without fine-tuning)
-2. Enzyme-specific prediction - (requires the corresponding fine-tuning file)
+1. Zero-shot prediction - general-purpose prediction without fine-tuning
+2. Enzyme-specific prediction - requires the corresponding low-throughput file
 
 ## Running:
 ```
