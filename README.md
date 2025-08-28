@@ -4,7 +4,7 @@ This repository provides the implementation and scripts to run DeepSCANEER.
 **DeepSCANEER** is designed to predict changes in enzyme activity caused by mutations. 
 In addition, DeepSCANEER incorporates enzyme-specific functions trained on low-throughput data, enabling ML-assisted directed evolution.
 
-**DeepSCANEER** is an upgraded version of **SCANEER**, incorporating parts of the original SCANEER code.
+**DeepSCANEER** is an upgraded version of **SCANEER**, incorporating parts of the original SCANEER code. \
 SCANEER github link: https://github.com/SBIlab/SCANEER
 
 ## Installation
