@@ -32,7 +32,7 @@ DeepSCANEER can be executed in one of two modes, depending on your analysis need
 
 You need to set the following parameters in main.py according to your situation.
 
-'''
+```
 #########################################################################################
 # === Parameters ===
 test_enzyme = '(enzyme_id)'
@@ -40,7 +40,7 @@ enzyme_specific_prediction = (True or False)
 enzyme_specific_data_num= (num of low-throughput data)
 
 #########################################################################################
-'''
+```
 Then, by running the following command in the terminal, a prediction_result file will be generated inside the result folder.
 ```
 python main.py
