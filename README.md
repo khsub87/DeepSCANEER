@@ -18,9 +18,9 @@ cd [repository-name]
 ## Input Data
 Before running DeepSCANEER, make sure that all required input files are placed under the data/ directory:
 
-+ **FASTA file (*.fasta)** - Query sequence(s) in FASTA format.
-+ **Alignment file (*.aln)** - Multiple sequence alignment for the query sequence(s).
-+ **low-throughput file (*_score.txt)** (optional) - Required only for enzyme-specific predictions.
++ **FASTA file ((enzyme_id).fasta)** - Query sequence(s) in FASTA format.
++ **Alignment file ((enzyme_id).aln)** - Multiple sequence alignment for the query sequence(s).
++ **low-throughput file ((enzyme_id)_score.txt)** (optional) - Required only for enzyme-specific predictions.
 
 ## Running DeepSCANEER
 DeepSCANEER can be executed in one of two modes, depending on your analysis needs:
@@ -29,6 +29,19 @@ DeepSCANEER can be executed in one of two modes, depending on your analysis need
 2. Enzyme-specific prediction - requires the corresponding low-throughput file
 
 ## Running:
+
+You need to set the following parameters in main.py according to your situation.
+
+'''
+#########################################################################################
+# === Parameters ===
+test_enzyme = '(enzyme_id)'
+enzyme_specific_prediction = (True or False)
+enzyme_specific_data_num= (num of low-throughput data)
+
+#########################################################################################
+'''
+Then, by running the following command in the terminal, a prediction_result file will be generated inside the result folder.
 ```
 python main.py
 ```
