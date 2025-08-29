@@ -20,6 +20,12 @@ warnings.filterwarnings(
     category=UserWarning,
     module="torch.nn.modules.instancenorm"
 )
+warnings.filterwarnings(
+    "ignore",
+    message="This model had a minor bug",
+    category=UserWarning,
+    module="esm.pretrained"
+)
 
 # --- Constants ---
 MAX_MSA_ROW_NUM = 800

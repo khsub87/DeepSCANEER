@@ -5,7 +5,7 @@ import pandas as pd
 from script.load_data import load_seq, get_all_mutation, load_mutagenesis
 from shannon_entropy import calc_ent_dic
 from transformer_feature import calc_transformer_feature 
-from trains_eval import predict_with_pretrained_model, predict_with_fine_tuning
+from trains_eval import predict_with_pretrained_model, predict_with_enzyme_specific_prediction
 from script.msa_transformer.run_a_prot import calc_attention
 
 #########################################################################################
@@ -32,7 +32,7 @@ def main(test_enzyme):
     x_test = [input_file[mut].tolist() for mut in all_mutation]
     
     # Fine-tuning if required
-    if fine_tuning:
+    if enzyme_specific_prediction:
         print(f"[{time.ctime()}] [DeepSCANEER prediction by fine-tuning]")
         mutagenesis_list, mutagenesis_dic = load_mutagenesis(query_mutagenesis_path, test_enzyme)
         overlapped_mutation = list(set(all_mutation).intersection(mutagenesis_list))
@@ -41,7 +41,7 @@ def main(test_enzyme):
         y_ft = [mutagenesis_dic[mut] for mut in overlapped_mutation]
         
         # Run fine-tuning prediction
-        result = predict_with_fine_tuning(
+        result = predict_with_enzyme_specific_prediction(
             test_enzyme, pre_train_path,x_ft, y_ft, x_test,result_dir
         )
     else:
@@ -57,17 +57,22 @@ def main(test_enzyme):
     data = [all_mutation] + [result[i] for i in range(10)] + [result['prediction_score']]
     test_enzyme_df = pd.DataFrame(data).T
     test_enzyme_df.columns = column_names
-    if enzyme_specific_prediction=="True":
+    if enzyme_specific_prediction:
         test_enzyme_df.to_csv(f"{result_dir}/{enzyme_ID}_DeepSCANEER_prediction_{enzyme_specific_data_num}.tsv", sep="\t", index=False)
-    elif enzyme_specific_prediction=="False":
+    else:
         test_enzyme_df.to_csv(f"{result_dir}/{enzyme_ID}_DeepSCANEER_prediction.tsv", sep="\t", index=False)
 
     return
 
 #########################################################################################
-
 # === Parameters ===
 test_enzyme = 'Q9NV35'
+enzyme_specific_prediction = False
+enzyme_specific_data_num=100
+
+#########################################################################################
+
+# === Path ===
 data_dir = os.path.join('../data', test_enzyme)
 os.makedirs(data_dir, exist_ok=True)
 
@@ -79,11 +84,7 @@ os.makedirs(result_dir, exist_ok=True)
 
 pre_train_path = f'../pre_train_weight'
 
-fine_tuning = False
-query_mutagenesis_path = f'{data_dir}/{test_enzyme}_score.txt' if fine_tuning else None
-enzyme_specific_data_num=100
-
-#########################################################################################
+query_mutagenesis_path = f'{data_dir}/{test_enzyme}_score.txt' if enzyme_specific_prediction else None
 
 # Run
 main(test_enzyme)
