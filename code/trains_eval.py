@@ -6,7 +6,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import pandas as pd
 from collections import defaultdict
 
-from deep_model import Classifier  # 모델 정의
+from deep_model import Classifier 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
