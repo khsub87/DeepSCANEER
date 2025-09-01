@@ -41,10 +41,14 @@ enzyme_specific_data_num= (num of low-throughput data)
 
 #########################################################################################
 ```
+
 Then, by running the following command in the terminal, a prediction_result file will be generated inside the result folder.
 ```
 python main.py
 ```
+
+The outputs will be in a directory result/
+
 
 ## Notes
 + Zero-shot mode works directly without any additional fine-tuning.
