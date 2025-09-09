@@ -5,7 +5,7 @@ import pandas as pd
 from script.load_data import load_seq, get_all_mutation, load_mutagenesis
 from shannon_entropy import calc_ent_dic
 from transformer_feature import calc_transformer_feature 
-from trains_eval import predict_with_pretrained_model, predict_with_enzyme_specific_prediction
+from train_and_eval import predict_with_pretrained_model, predict_with_enzyme_specific_prediction
 from script.msa_transformer.run_a_prot import calc_attention
 
 #########################################################################################
@@ -58,15 +58,15 @@ def main(test_enzyme):
     test_enzyme_df = pd.DataFrame(data).T
     test_enzyme_df.columns = column_names
     if enzyme_specific_prediction:
-        test_enzyme_df.to_csv(f"{result_dir}/{enzyme_ID}_DeepSCANEER_prediction_{enzyme_specific_data_num}.tsv", sep="\t", index=False)
+        test_enzyme_df.to_csv(f"{result_dir}/{test_enzyme}_DeepSCANEER_prediction_{enzyme_specific_data_num}.tsv", sep="\t", index=False)
     else:
-        test_enzyme_df.to_csv(f"{result_dir}/{enzyme_ID}_DeepSCANEER_prediction.tsv", sep="\t", index=False)
+        test_enzyme_df.to_csv(f"{result_dir}/{test_enzyme}_DeepSCANEER_prediction.tsv", sep="\t", index=False)
 
     return
 
 #########################################################################################
 # === Parameters ===
-test_enzyme = 'Q9NV35'
+test_enzyme = 'P51580'
 enzyme_specific_prediction = False
 enzyme_specific_data_num=100
 
