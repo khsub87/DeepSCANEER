@@ -50,6 +50,11 @@ python main.py
 
 The outputs will be in a directory result/
 
+## License
+This repository incorporates code derived from the A_Prot_Paper GitHub project by arontier, licensed under CC BY-NC-SA 4.0.  
+Accordingly, this work is also distributed under the same license.
+
+
 
 ## Notes
 + Zero-shot mode works directly without any additional fine-tuning.
