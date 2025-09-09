@@ -55,7 +55,6 @@ The outputs will be in a directory result/
 + Enzyme-specific mode uses the provided fine-tuning file (*_ft.txt) to adapt predictions to a specific enzyme.
 
 ## License
-## License
 This repository is released under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
 Portions of this code are adapted from [A_Prot_Paper](https://github.com/arontier/A_Prot_Paper) by arontier, which is also licensed under CC BY-NC-SA 4.0.
 
