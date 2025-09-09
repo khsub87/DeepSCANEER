@@ -20,7 +20,8 @@ Before running DeepSCANEER, make sure that all required input files are placed u
 
 + **FASTA file ((enzyme_id).fasta)** - Query sequence(s) in FASTA format.
 + **Alignment file ((enzyme_id).aln)** - Multiple sequence alignment for the query sequence(s).
-\The first line of the Alignment file must be the same as test_enzyme and should match its name exactly. 
+
+The first line of the Alignment file must be the same as test_enzyme and should match its name exactly. 
 + **low-throughput file ((enzyme_id)_score.txt)** (optional) - Required only for enzyme-specific predictions.
 
 ## Running DeepSCANEER
