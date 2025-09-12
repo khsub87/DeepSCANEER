@@ -38,7 +38,6 @@ You need to set the following parameters in main.py according to your situation.
 # === Parameters ===
 test_enzyme = '(enzyme_id)'
 enzyme_specific_prediction = (True or False)
-enzyme_specific_data_num= (num of low-throughput data)
 
 #########################################################################################
 ```
