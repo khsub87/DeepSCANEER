@@ -38,7 +38,6 @@ You need to set the following parameters in main.py according to your situation.
 # === Parameters ===
 test_enzyme = '(enzyme_id)'
 enzyme_specific_prediction = (True or False)
-enzyme_specific_data_num= (num of low-throughput data)
 
 #########################################################################################
 ```
@@ -50,7 +49,11 @@ python main.py
 
 The outputs will be in a directory result/
 
-
 ## Notes
 + Zero-shot mode works directly without any additional fine-tuning.
 + Enzyme-specific mode uses the provided fine-tuning file (*_ft.txt) to adapt predictions to a specific enzyme.
+
+## License
+This repository is released under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
+Portions of this code are adapted from [A_Prot_Paper](https://github.com/arontier/A_Prot_Paper) by arontier, which is also licensed under CC BY-NC-SA 4.0.
+
