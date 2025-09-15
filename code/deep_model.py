@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-#
+
 class Classifier(nn.Module):
     def __init__(self, hidden_size=128, dropout_rate=0.2):
         super(Classifier, self).__init__()
@@ -28,25 +26,14 @@ class Classifier(nn.Module):
         torch.nn.init.xavier_uniform_(self.fc1.weight)
         torch.nn.init.xavier_uniform_(self.fc2.weight)
 
-    def forward(self, x_input):
-        if not isinstance(x_input, np.ndarray):
-            x_input = x_input.detach().cpu().numpy()
-
-        scaler = StandardScaler()
-        x_input = scaler.fit_transform(x_input)
-
-        x_input = torch.from_numpy(x_input).float()
-        x_input = x_input.unsqueeze(-1)  # (batch, features, 1)
-        x_input = x_input.to(self.conv1.weight.device)
-
-        x = self.conv1(x_input)
+    def forward(self, x):
+        x = x.unsqueeze(-1)
+        x = self.conv1(x)
         x = self.relu1(x)
-
         x = self.conv2(x)
         x = self.relu2(x)
-        
+
         x = x.view(x.size(0), -1)
-        
         x = self.fc1(x)
         x = self.bnfc(x)
         x = self.relu3(x)

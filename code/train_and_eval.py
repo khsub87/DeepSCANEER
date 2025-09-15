@@ -5,14 +5,19 @@ import torch.optim as optim
 from torch.utils.data import TensorDataset, DataLoader
 import pandas as pd
 from script.metrics import ndcg_at_k_minmax
-
+from sklearn.preprocessing import StandardScaler
 from deep_model import Classifier 
+from collections import defaultdict
+from sklearn.model_selection import KFold
+import glob
+import numpy as np
+import re
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 def _load_state_dict(path):
     try:
-        return torch.load(path, map_location="cpu", weights_only=True)
+        return torch.load(path, map_location="cpu")
     except TypeError:
         return torch.load(path, map_location="cpu")
 
@@ -54,8 +59,8 @@ def predict_with_pretrained_model(pre_train_path, x_test,
     return result
 
 
-def predict_with_enzyme_specific_prediction(test_enzyme,pre_train_path,
-                             x_train, y_train, x_test, result_dir, 
+def predict_with_enzyme_specific_prediction(test_enzyme, pre_train_path,
+                             x_train, y_train, x_test, 
                              hidden_size=128, dropout_rate=0,
                              ft_epochs=50, learning_rate=1e-5, fold_num=10):
 
@@ -68,7 +73,6 @@ def predict_with_enzyme_specific_prediction(test_enzyme,pre_train_path,
         pre_train_path (str): Directory path containing pre-trained weights.
         x_train, y_train (array-like): Training dataset and labels.
         x_test (array-like): Test dataset.
-        result_dir (str): Directory to save results.
         hidden_size (int): Hidden layer size of the classifier.
         dropout_rate (float): Dropout rate for the classifier.
         ft_epochs (int): Number of epochs for fine-tuning.
@@ -80,9 +84,14 @@ def predict_with_enzyme_specific_prediction(test_enzyme,pre_train_path,
     """
 
     result = pd.DataFrame()
-    x_train_tensor = torch.tensor(x_train, dtype=torch.float32).to(device)
+
+    scaler_x = StandardScaler().fit(x_train)
+    x_train_scaled = scaler_x.transform(x_train)
+    x_test_scaled = scaler_x.transform(x_test) 
+
+    x_train_tensor = torch.tensor(x_train_scaled, dtype=torch.float32).to(device)
     y_train_tensor = torch.tensor(y_train, dtype=torch.float32).to(device)
-    x_test_tensor = torch.tensor(x_test, dtype=torch.float32).to(device)
+    x_test_tensor = torch.tensor(x_test_scaled, dtype=torch.float32).to(device)
 
     for fold in range(fold_num):
         model = Classifier(hidden_size, dropout_rate).to(device)
@@ -101,6 +110,7 @@ def predict_with_enzyme_specific_prediction(test_enzyme,pre_train_path,
         # DataLoader
         train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
         train_loader = DataLoader(train_dataset, batch_size=24, shuffle=True, drop_last=True)
+        torch.set_grad_enabled(True)
 
         # Fine-tuning
         for epoch in range(ft_epochs):
@@ -108,8 +118,10 @@ def predict_with_enzyme_specific_prediction(test_enzyme,pre_train_path,
             for batch_inputs, batch_labels in train_loader:
                 batch_inputs, batch_labels = batch_inputs.to(device), batch_labels.to(device)
                 optimizer.zero_grad()
+
                 batch_outputs = model(batch_inputs)
                 loss = criterion(batch_outputs, batch_labels)
+
                 loss.backward()
                 optimizer.step()
 
@@ -121,7 +133,7 @@ def predict_with_enzyme_specific_prediction(test_enzyme,pre_train_path,
 
     return result
 
-def train_model(test_enzyme, x_train, y_train, x_test, y_test, result_dir,
+def train_model(test_enzyme, x_train, y_train, x_test, y_test, weight_dir,version,
                 hidden_size=128, dropout_rate=0.5, num_epochs=700,
                 learning_rate=0.01, fold_num=10):
     """
@@ -131,7 +143,8 @@ def train_model(test_enzyme, x_train, y_train, x_test, y_test, result_dir,
         test_enzyme (str): Name of the enzyme (used for saving weights).
         x_train, y_train (array-like): Training data and labels.
         x_test, y_test (array-like): Test data and labels.
-        result_dir (str): Directory where results and model weights are saved.
+        weight_dir (str): Directory where model weights are saved.
+        version (str): version of train set. 
         hidden_size (int): Hidden layer size of the classifier.
         num_epochs (int): Number of epochs for training each fold.
         dropout_rate (float): Dropout rate for the classifier.
@@ -147,11 +160,11 @@ def train_model(test_enzyme, x_train, y_train, x_test, y_test, result_dir,
     starting_point = 0
 
     # Find existing trained folds (resume from the last fold if exists)
-    file_pattern= f"{result_dir}/model_weight/{test_enzyme}_*_fcn_weight.pth"
+    file_pattern= f"{weight_dir}/{version}_*_fcn_weight.pth"
     files = glob.glob(file_pattern)
     nums = []
     for file in files:
-        match = re.search(rf"{test_enzyme}_(\d+)_fcn_weight\.pth", os.path.basename(file))
+        match = re.search(rf"{version}_(\d+)_fcn_weight\.pth", os.path.basename(file))
         if match:
             nums.append(match.group(1))
     if nums:
@@ -171,10 +184,14 @@ def train_model(test_enzyme, x_train, y_train, x_test, y_test, result_dir,
         kf=KFold(n_splits=5,shuffle=True,random_state=random_seed)
         train_index, val_index = next(kf.split(x_train_valid))
 
+        scaler_x = StandardScaler().fit(x_train_valid)
+        x_train_scaled = scaler_x.transform(x_train_valid)
+        x_test_scaled = scaler_x.transform(x_test) 
+
         # Split into train/val sets
-        x_train_fold = torch.tensor(x_train_valid[train_index], dtype=torch.float32).to(device)
+        x_train_fold = torch.tensor(x_train_scaled[train_index], dtype=torch.float32).to(device)
         y_train_fold = torch.tensor(y_train_valid[train_index], dtype=torch.float32).to(device)
-        x_val_fold = torch.tensor(x_train_valid[val_index], dtype=torch.float32).to(device)
+        x_val_fold = torch.tensor(x_train_scaled[val_index], dtype=torch.float32).to(device)
         y_val_fold = torch.tensor(y_train_valid[val_index], dtype=torch.float32).to(device)
 
         train_dataset = TensorDataset(x_train_fold, y_train_fold)
@@ -187,6 +204,7 @@ def train_model(test_enzyme, x_train, y_train, x_test, y_test, result_dir,
         model= Classifier(hidden_size, dropout_rate).to(device)
         optimizer = optim.SGD(model.parameters(), lr=learning_rate)
         scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[10], gamma=0.1)
+        torch.set_grad_enabled(True)
 
         # Training loop
         high_val_ndcg=0
@@ -237,7 +255,7 @@ def train_model(test_enzyme, x_train, y_train, x_test, y_test, result_dir,
                 high_val_ndcg=val_ndcg
                 print("######################################################")
                 print(f"epoch {epoch}, best val_ndcg {high_val_ndcg:.4f}")
-                torch.save(model.state_dict(),'%s/model_weight/%s_%s_fcn_weight.pth'%(result_dir,test_enzyme,fold))
+                torch.save(model.state_dict(),f'{weight_dir}/{version}_{fold}_fcn_weight.pth')
 
         print(f"Fold {fold} - Validation Accuracy: {val_loss:.4f}")
         fold=fold+1
@@ -249,7 +267,7 @@ def train_model(test_enzyme, x_train, y_train, x_test, y_test, result_dir,
     for fold in range(fold_num):
         model= Classifier(hidden_size, dropout_rate).to(device)
         model.load_state_dict(torch.load(
-            f"{result_dir}/model_weight/{test_enzyme}_{fold}_fcn_weight.pth",
+            f"{weight_dir}/{version}_{fold}_fcn_weight.pth",
         ))
         model.eval()
         
